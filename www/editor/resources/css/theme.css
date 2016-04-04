@@ -1,0 +1,88 @@
+@charset "utf-8";
+
+/*
+Color
+Fasoo LightBlue: #51A0CF
+Fasoo DeepBlue: #2184B8
+Fasoo LightGreen: #70B153
+Fasoo DeepGreen: #399B57
+Fasoo LightOrange: #F4AB40
+Fasoo DeepOrange: #ED9519
+Michael Son 6-Level Gray: 	#000	#333	#666	#999	#CCC	#FFF
+Michael Son 4-Level Gray:	#000	#555	#AAA	#FFF
+*/
+
+/*Elements*/
+input {border: 0; border-bottom: 1px solid #CCC; color: #333; padding: 0.5em 0em;}
+button {padding: 0.5em 1em; border: 0; border-radius: 0.2em; background-color: #CCC; color: #333;}
+button:hover {background-color: #70B153; color: #FFF;}
+
+
+/*Layout*/
+body {}
+
+::selection {background-color: #70B153; color: #FFF;}
+::-moz-selection {background-color: #70B153; color: #FFF;}
+
+/*Body*/
+	div.window {background-color: #FFF;}
+	div.window > h2 {display: none; padding: 0.5em 1em; background-color: #CCC; color: #FFF;}
+
+	div.blockBox > ul > li {z-index: 2; padding: 0.5em 1em; border-radius: 1.5em; margin: 0.5em 1em; background-color: rgba(0,0,0,0.5); color: #FFF;}
+		div.blockBox > ul > li > code {display: none;}
+
+	div.console > div#result {position: absolute; top: 0; right: 0; bottom: 0; left: 0; padding: 1em; font-size: 0.8em; overflow: auto;}
+	div.console > div#result > p {font-family:'Nanum Gothic Coding';}
+	div.console > div#result > p.stdout {color: #CCC;}
+	div.console > div#result > p.stderr {color: #F00;}
+	div.console > div#result > p.nothing {color: #FC0;}
+
+	div.popupLayer {display: none; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; -webkit-filter: grayscale(50%) blur(1em)}
+	div.popupLayer > div {display: table; table-layout: fixed; width: 100%; height: 100%;}
+	div.popupLayer > div > div {display: table-cell; text-align: center; vertical-align: middle; }
+	div.popupLayer > div > div > div {display: inline-block; position: relative; width: 20em; background-color: #FFF; border-radius: 0.2em; box-shadow: 0 0 3em rgba(0,0,0,0.4);}
+	div.popupLayer > div > div > div > h2 {margin-bottom: 0.5em; font-size: 2em;}
+	div.popupLayer#signin > div > div > div > div {padding: 0.5em 1em; margin-bottom: 0.5em;}
+	div.popupLayer#signin > div > div > div > div.topButtons {padding: 0.5em; margin-bottom: 0; text-align: right; font-size: 2em;}
+	div.popupLayer#signin > div > div > div > div.topButtons > a {color: #999;}
+	div.popupLayer#signin > div > div > div > div.topButtons > a:hover {text-decoration: none; color: #ED9519;}
+	div.popupLayer#signin input, div.popupLayer#signin button {width: 100%;}
+	div#signinETC > a {margin: 0 1em; font-size: 0.8em; color: #51A0CF;}
+
+/*Footer*/
+
+/*Phone*/
+@media screen and (max-width: 479px){
+}
+@media screen and (min-width: 480px) and (max-width: 767px) {
+}
+@media screen and (max-width: 767px) {
+	body {font-size: 16px; padding-top: 3em;}
+	header {overflow-x: auto; overflow-y: hidden;}
+	div.window {display: block; width: 100%;}
+	div.blockCanvas {height: 250px; background-color: #FFF;}
+		div.runButtons {position: absolute; right: 0; left: 0; bottom: 0; padding: 1em; background-color: #333;}
+	div.codeViewer {height: 15em;}
+		div#editor {height: 250px;}
+}
+
+/*Desktop*/
+@media screen and (min-width: 768px) {
+	div.mission {position: absolute; top: 5em; right: 0; left: 0; height: 6em;}
+	div.blockBox {position: absolute; top: 5em; left: 0; bottom: 30%; right: 80%; background-color: #D8DEE8;}
+	div.blockCanvas {position: absolute; top: 5em; left: 20%; bottom: 30%; right: 40%;}
+		div.runButtons {position: absolute; right: 0; bottom: 0; left: 0; padding: 0.5em 1em; background-color: #00F; text-align: right;}
+		div.codeViewer {border-left: 1px solid #CCC; position: absolute; top: 5em; left: 60%; bottom: 30%; right: 0;}
+		div#editor {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
+	div.console {position: absolute; top: 70%; left: 0; bottom: 0; right: 0; background-color: #000; color: #CCC;}
+	div#console {position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 8; font-size: 0.8em;}
+}
+@media screen and (min-width: 768px) and (max-width: 1440px) {
+	body {font-size: 18px;}
+}
+@media screen and (min-width: 1441px) and (max-width: 1920px) {
+	body {font-size: 20px;}
+}
+@media screen and (min-width: 1921px) {
+	body {font-size: 22px;}
+}

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>풋코딩 - 에디터</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+		<meta name='viewport' content='initial-scale=1,maximum-scale=1.0, user-scalable=no'>
+		<meta name='theme-color' content='#70B153'>
+		<link rel='shortcut icon' type='image/x-icon' href='/resources/favicon.ico' />
+		<link rel='icon' type='image/x-icon' href='/resources/favicon.ico' />
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src='//code.jquery.com/ui/1.11.4/jquery-ui.min.js'></script>
+		<script src="resources/js/jqconsole/jqconsole.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script> 
+		<script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script>
+		
+		<script src='resources/js/blockly/blockly_compressed.js'></script>
+		<script src='resources/js/blockly/blocks_compressed.js'></script>
+		<script src='resources/js/blockly/python_compressed.js'></script>
+		<script src='resources/js/blockly/msg/js/ko.js'></script>
+		
+		<script src='resources/js/prism.js'></script>
+		
+		<script type='text/javascript'>
+		//<![CDATA[  
+		//Skulpt
+		var running=1;
+		
+	
+		function outf(text) {
+			jqconsole.Write(text, 'jqconsole-output');
+		} 
+		function builtinRead(x) {
+		    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+		            throw "File not found: '" + x + "'";
+		    return Sk.builtinFiles["files"][x];
+		}
+		
+		var fullSizeFlag;
+		$(function(){
+			window.jqconsole = $('#console').jqconsole('', '>>> ');
+			
+			$("ul.menubar > li").hover(function() {
+				$(this).css("background", "rgba(0,0,0,0.5)");
+				$(this).children("ul").css("display", "block");
+			}, function() {
+				$(this).css("background", "initial");
+				$(this).children("ul").css("display", "none");
+			});
+			$("li#menu_account > a").click(function() {
+				$("div.popupLayer").css("display", "block");
+			});
+			$("div.popupLayer").click(function() {
+				$(this).css("display", "none");
+			});
+			$("ul.user > li").hover(function(){
+				$(this).css("background", "rgba(0,0,0,0.5)");
+				$("div.userMenu").css("display", "block");
+			}, function() {
+				$(this).css("background", "initial");
+				$("div.userMenu").css("display", "none");
+			});
+			
+			$("a#run").click(function() { 
+				var prog = editor.getValue();
+				//Sk.pre = 'console';
+				jqconsole.Write("=================="+running+"=======================\n", 'jqconsole-output');
+				running++;
+				Sk.configure({output:outf, read:builtinRead}); 
+				(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'canvas';
+				var myPromise = Sk.misceval.asyncToPromise(function() {
+					return Sk.importMainWithBody("<stdin>", false, prog, true);
+				});
+				myPromise.then(function(mod) {
+					console.log('success');
+				},
+				function(err) {
+					console.log(err);
+				});
+			});
+			
+			$("button#check").click(function() {
+				$("div#correct").css("display", "block");
+				$("header").css("-webkit-filter", "blur(.5em)");
+				$("div.windows").css("-webkit-filter", "blur(.5em)");
+				$("div.blocklyToolboxDiv").css("-webkit-filter", "blur(.5em)");
+			});
+			
+			$("button#run").click(function() {
+				$("a#run").click();
+			});
+			
+			$("a.openMissionList").click(function() {
+				$("div.missionList").css("animation-name", "openMissionList");
+				$("div.missionList").css("-webkit-animation-name", "openMissionList");
+			});
+			$("a.closeMissionList").click(function() {
+				$("div.missionList").css("animation-name", "closeMissionList");
+				$("div.missionList").css("-webkit-animation-name", "closeMissionList");
+			});
+			$("a#export").hover(function() {
+				var xml = Blockly.Xml.workspaceToDom(blockly);
+				//$(this).attr('href', 'data:text/xml,'+Blockly.Xml.domToPrettyText(xml));
+				$(this).attr('href', 'data:text/xml,'+Blockly.Xml.domToText(xml));
+			}, function() {
+				$(this).attr('href', '#');
+			});
+			
+			$("a#import").click(function() {
+				$('input#fileImporter').click();
+			});
+			
+			$("div.blockEditor > h2 > span > a").click(function(e) {
+				if(fullSizeFlag === null || fullSizeFlag === undefined || fullSizeFlag === false) {
+					$("div.window").css("display", "none");
+					$("div.blockEditor").css("display", "block");
+					$("div.blockEditor").css("animation-name", "getLager");
+					$("div.blockEditor").css("-webkit-animation-name", "getLager");
+					$("div.blockEditor").css("right", "0");
+					$("div.blockEditor").css("bottom", "0");
+					$("div.blockEditor").css("left", "0");
+					$("div.blockEditor").one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+						Blockly.svgResize(blockly);
+					});
+					$("div.blockEditor h2 span i").attr("class", "xi-compress");
+					fullSizeFlag = true;
+				} else {
+					$("div.window").css("display", "block");
+					$("div.blockEditor").css("animation-name", "getSmaller");
+					$("div.blockEditor").css("-webkit-animation-name", "getSmaller");
+					$("div.blockEditor").css("right", "35%");
+					$("div.blockEditor").css("bottom", "12em");
+					$("div.blockEditor").css("left", "30%");
+					$("div.blockEditor").one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+						Blockly.svgResize(blockly);
+					});
+					$("div.blockEditor h2 span i").attr("class", "xi-expand");
+					fullSizeFlag = false;
+				}
+			});
+			
+			$('input#fileImporter').change(function(e) {
+				//Get the file object 
+		        var fileTobeRead = $(this)[0].files[0];
+				//Initialize the FileReader object to read the file 
+				var fileReader = new FileReader();
+				fileReader.onload = function (e) { 
+					//var fileContents = document.getElementById('filecontents'); 
+					//fileContents.innerText = fileReader.result;
+					var xml = Blockly.Xml.textToDom(fileReader.result);
+					Blockly.Xml.domToWorkspace(blockly, xml);
+				} 
+				fileReader.readAsText(fileTobeRead);
+				$(this).val('');
+			});
+		});
+		//]]>
+		</script>
+		<style type='text/css'>
+			@import url('//cdn.jsdelivr.net/font-nanum/1.0/nanumgothiccoding/nanumgothiccoding.css');
+			@import url('//cdn.jsdelivr.net/xeicon/1.0.4/xeicon.min.css');
+			@import url('resources/css/reset.css');
+			@import url('resources/css/fonts.css');
+			@import url('resources/css/fontsize.css');
+			@import url('resources/css/jqconsole.css');
+			@import url('resources/css/prism.css');
+			
+			/*
+			Color
+			Fasoo LightBlue: #51A0CF
+			Fasoo DeepBlue: #2184B8
+			Fasoo LightGreen: #70B153
+			Fasoo DeepGreen: #399B57
+			Fasoo LightOrange: #F4AB40
+			Fasoo DeepOrange: #ED9519
+			Michael Son 6-Level Gray: 	#000	#333	#666	#999	#CCC	#FFF
+			Michael Son 4-Level Gray:	#000	#555	#AAA	#FFF
+			*/
+			
+			i {vertical-align: -.15em;}
+			
+			body {font-family: 'BM JUA'; background: url(resources/images/pattern.png) repeat;}
+			
+			header {position: absolute; top: 0; right: 0; left: 0; height: 3em; background: #51A0CF; box-shadow: 0 0 1em #000; font-weight: 200; color: #FFF;}
+			
+			header a {color: #FFF;}
+			header a:hover {text-decoration: none;}
+			header > h1 {float: left; color: #FFF; height: 2em; padding: 0.5em 0.5em 0.5em 1em;}
+			header > h1 > a > svg {vertical-align: middle;}
+			
+			header > nav > ul.toolbar {}
+				header > nav > ul.toolbar > li {display: inline-block;}
+				header > nav > ul.toolbar > li > a {display: inline-block; padding: 1em 0.5em; height: 1em;}
+				header > nav > ul.toolbar > li > a:hover {background-color: rgba(0,0,0,0.5);}
+			
+			header > ul.user {position: absolute; top: 0; right: 0; text-align: center; background: #70B153; color: #FFF;}
+			header > ul.user > li {z-index: 999; height: 1em; padding: 1em 3em;}
+				header > ul.user > li > div {display: none; position: absolute; top: 100%; right:0; z-index: 999; background-color: #FFF;}
+					header > ul.user > li > div > div.profile {padding: 2em;}
+						header > ul.user > li > div > div.profile > img {width: 10em; height: 10em; border-radius: 10em; margin-bottom: 0.5em;}
+						header > ul.user > li > div > div.profile > span {color: #2184B8;}
+						header > ul.user > li > div > ul > li > a {display: block; padding: 1em; text-align: left; background-color: #51A0CF;}
+						header > ul.user > li > div > ul > li > a:hover {background-color: #2184B8; text-decoration: none;}
+			
+			div.popupLayer {display: none; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; -webkit-filter: blur(0)}
+			div.popupLayer > div {display: table; table-layout: fixed; width: 100%; height: 100%;}
+			div.popupLayer > div > div {display: table-cell; text-align: center; vertical-align: middle; }
+			div.popupLayer > div > div > div {display: inline-block; position: relative;}
+			div.popupLayer > div > div > div > h2 {margin-bottom: 0.5em; font-size: 2em;}
+			div.popupLayer > div > div > div > img {width: 50%}
+			
+			div.windows {position: absolute; top: 3em; right: 0; bottom: 0; left: 0; margin: 0.5em;}
+			
+				div.window {margin: 0.5em; background: #FFF; box-shadow: 0 0 1em #000;}
+					div.window > h2 {height: 1em; padding: 0.5em 1em; background: #51A0CF; color: #FFF;}
+				
+				div.missionList {position: absolute; top: 0; width: 3em; left: 0; color: #FFF; text-align: center;}
+					div.missionList li {padding: 0.25em; font-size: 2em; background: #CCC; border-top: 1px solid #999; height: 1em;}
+					div.missionList li:first-child {background: #51A0CF; border: 0;}
+					div.missionList li:nth-child(2) {background: #70B153;}
+					div.missionList li:nth-child(3) {background: #70B153;}
+					div.missionList li:nth-child(4) {background: #70B153;}
+					div.missionList li:nth-child(5) {background: #F4AB40;}
+				
+				
+				div.mission {position: absolute; top: 0; right: 70%; bottom: 0; left: 4em; overflow-y: hidden;}
+					div.mission > h2 {background: #F4AB40;}
+					div.mission > div.description {padding: 1em;}
+					div.mission > div.description > p {font-family: 'BM JUA'; color: #666; margin-bottom: 1em;}
+					div.mission h3 {background: #51A0CF; color: #FFF; padding: 0.5em;}
+				
+				@keyframes getLager {
+					from {right: 35%; bottom: 12em; left: 30%;}
+					to {right: 0; bottom: 0; left: 0;}
+				}
+				@keyframes getSmaller {
+					from {right: 0; bottom: 0; left: 0;}
+					to {right: 35%; bottom: 12em; left: 30%;}
+				}
+				
+				div.blockEditor {position: absolute; top: 0; right: 35%; bottom: 12em; left: 30%; -webkit-animation: 0.2s ease-out; animation: 0.2s ease-out;}
+					div.blockEditor h2 span {position: absolute; right: 0; padding: 0 1em;}
+					div.blockEditor h2 span a {color: #FFF;}
+					div#blockEditor {position: absolute; top: 2em; right: 0; bottom: 0; left: 0;}
+				
+				div.codeViewer {position: absolute; top: 0; right: 0; bottom: 12em; left: 65%;}
+					div#editor {position: absolute; top: 2em; right: 0; bottom: 0; left: 0; font-size: 1em;}
+					div.codeViewer h2 span {display: block; position: absolute; top: 0; right: 0; padding: 0.5em 1em; background: #70B153;}
+					div.codeViewer h2 span a {color: #FFF;}
+					div.codeViewer > button {position: absolute; height: 2em; z-index: 999; border: 0; border-radius: 3em; padding: .5em 1em; color: #FFF; font-family: 'BM JUA'}
+					div.codeViewer > button#run {right: .5em; bottom: .5em; background: #70B153;}
+					div.codeViewer > button#check {right: 5.5em; bottom: .5em; background: #F4AB40;}
+				
+				div.console {position: absolute; right: 0; bottom: 0; left: 30%; height: 11em; background: #000; color: #FFF;}
+					div#console {position: absolute; top: 2em; right: 0; bottom: 0; left: 0; font-family: 'NanumGothicCoding';}
+		</style>
+	</head>
+	<body>
+		<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1024 1024" style="enable-background:new 0 0 1024 1024; display: none;" xml:space="preserve" fill='#FFF'>
+ 		<defs>
+ 			<g id='footCoding'>
+			<ellipse id="XMLID_58_" transform="matrix(0.1665 -0.986 0.986 0.1665 142.2654 483.5878)" cx="357.2" cy="157.6" rx="43.5" ry="35.8"/>
+			<ellipse id="XMLID_57_" transform="matrix(0.4038 -0.9149 0.9149 0.4038 155.1462 528.7426)" cx="483.2" cy="145.3" rx="56.3" ry="41"/>
+			<ellipse id="XMLID_56_" transform="matrix(0.5829 -0.8125 0.8125 0.5829 115.6298 575.9074)" cx="618.8" cy="175.3" rx="58.9" ry="48.6"/>
+			<ellipse id="XMLID_55_" transform="matrix(0.682 -0.7313 0.7313 0.682 56.483 636.1974)" cx="759.9" cy="253.1" rx="81.9" ry="58.9"/>
+			<ellipse id="XMLID_54_" transform="matrix(-0.3603 -0.9328 0.9328 -0.3603 817.1587 1424.4939)" cx="897" cy="432.1" rx="99.8" ry="130.5"/>
+			<path id="XMLID_53_" d="M40,641.6c0,0,92.1-163.8,140.8-227.8c61.4-79.3,128-117.7,168.9-135.7c81.9-35.8,171.5-2.6,181.7,0
+			c174,56.3,225.2,261.1,174,337.9c-125.4,166.4-261.1,28.2-407,230.4C155.1,1046-98.3,866.9,40,641.6"/>
+			</g>
+		</defs>
+		</svg>
+		<input id='fileImporter' type='file' />
+		
+		<div class='popupLayer' id='correct'>
+			<div>
+				<div>
+					<div>
+						<img src='resources/images/card.png' />
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<header>
+			<h1><a href='/'><svg viewBox='0 0 1024 1024' style='fill: #FFF; width: 2em; height: 2em; padding: 0;'><use xlink:href='#footCoding'></use></svg> 홈으로</a></h1>
+			<nav>
+				<ul class='toolbar'>
+					<li><a id='save' href='#'><i class='xi-diskette'></i> 저장하기</a></li>
+					<li><a id='open' href='#'><i class='xi-folder-open'></i> 열기</a></li>
+					<li><a id='export' href='#' download='footcoding.fcd'><i class='xi-cloud-download'></i> 내보내기</a></li>
+					<li><a id='import' href='#'><i class='xi-cloud-upload'></i> 가져오기</a></li>
+					<li><a id='run' href='#'><i class='xi-unknown-circle'></i> 도움말</a></li>
+				</ul>
+			</nav>
+			<ul class='user'>
+				<li><i class='xi-user-circle'></i> imfasoo
+					<div class='userMenu'>
+						<div class='profile'>
+							<img src='resources/images/photo.jpg' />
+							<span>imfasoo</span>
+						</div>
+						<ul>
+							<li><a href='#'>사용자 정보 보기</a></li>
+							<li><a href='#'>내 프로젝트 보기</a></li>
+							<li><a href='#'>로그아웃</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</header>
+		<div class='windows'>
+			<div class='window missionList'>
+				<ul>
+					<li><i class='xi-bars'></i></li>
+					<li><i class='xi-check-circleout'></i></li>
+					<li><i class='xi-check-circleout'></i></li>
+					<li><i class='xi-check-circleout'></i></li>
+					<li><i class='xi-flag-triangle'></i></li>
+					<li><i class='xi-record'></i></li>
+					<li><i class='xi-record'></i></li>
+					<li><i class='xi-record'></i></li>
+					<li><i class='xi-record'></i></li>
+					<li><i class='xi-record'></i></li>
+					<li><i class='xi-record'></i></li>
+				</ul>
+			</div>
+			
+			<div class='window mission'>
+				<h2>구구단 모두 출력하기</h2>
+				<div class='description'>
+					<p>구구단은 무엇일까요?<br />
+이세돌 9단과 알파고 9단이 만나면 구구단일까요?<br />
+<br />
+아니예요~ 1부터 9까지의 숫자에다가<br />
+또 다시 1부터 9까지의 숫자를 각각 곱한 것을 미리 계산해둔 것이 바로 구구단이예요<br />
+<br />
+그런데 여러분 곱셈을 잘 못한다구요? 걱정마세요~ 앞으로는 알파고가<br />
+모든 것을 다 해줄테니까<br />
+여러분은 구구단 같은거 외울 필요가 없어요.<br />
+<br />
+하지만 그 대신 여러분이 해야할 일이 있어요. 알파고한테 곱셈을 시키는 법을 배우는 것이예요.<br />
+<br />
+그러면 결과창에 구구단 1단부터 9단까지 블럭을 이용해서 출력해볼까요?</p>
+					
+					<h3>결과</h3>
+					<pre><code class='language-python'>1 * 1= 1
+1 * 2 = 2
+1 * 3 = 3
+1 * 4 = 4
+1 * 5 = 5
+1 * 6 = 6
+1 * 7 = 7
+1 * 8 = 8
+1 * 9 = 9
+2 * 1 = 2
+2 * 2 = 4
+2 * 3 = 6
+2 * 4 = 8
+2 * 5 = 10</code></pre>
+				</div>
+			</div>
+			
+			<div class='window blockEditor'>
+				<h2><i class='xi-canvas'></i> 블록 에디터 <span><a href='#'><i class='xi-expand'></i></a></span></h2>
+				<div id='blockEditor'></div>
+			</div>
+			
+			<div class='window codeViewer'>
+				<button id='run'>▶︎ 실행</button>
+				<button id='check'><i class='xi-check'></i> 정답 확인</button>
+				<h2><i class='xi-code'></i> 코드 뷰어 <span><a href='#'>Python ▼</a></span></h2>
+				<div id='editor'></div>
+			</div>
+			
+			<div class='window console'>
+				<h2><i class='xi-caret-right-square'></i> 결과창</h2>
+				<div id='console'></div>
+			</div>
+			
+		</div>
+		
+		<div id='blocklyDiv' style='position: absolute;'></div>
+		
+		<footer>
+		
+		</footer>
+		<xml id="toolbox" style="display: none">
+    <category id="catLogic" colour="210" name="논리">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_null"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <category id="catLoops" colour="120" name="반복">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+        <value name="BY">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category id="catMath" colour="230" name="수학">
+      <block type="math_number"></block>
+      <block type="math_arithmetic">
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_single">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">9</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_trig">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">45</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constant"></block>
+      <block type="math_number_property">
+        <value name="NUMBER_TO_CHECK">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_change">
+        <value name="DELTA">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_round">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">3.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo">
+        <value name="DIVIDEND">
+          <shadow type="math_number">
+            <field name="NUM">64</field>
+          </shadow>
+        </value>
+        <value name="DIVISOR">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constrain">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="LOW">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="HIGH">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+    </category>
+    <category id="catText" colour="160" name="텍스트">
+      <block type="text"></block>
+      <block type="text_join"></block>
+      <block type="text_append">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="text_length">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_isEmpty">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+        <value name="FIND">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_trim">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_prompt_ext">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category id="catLists" colour="260" name="리스트">
+      <block type="lists_create_with">
+        <mutation items="0"></mutation>
+      </block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getIndex">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_setIndex">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getSublist">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_split">
+        <value name="DELIM">
+          <shadow type="text">
+            <field name="TEXT">,</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category id="catColour" colour="20" name="색상">
+      <block type="colour_picker"></block>
+      <block type="colour_random"></block>
+      <block type="colour_rgb">
+        <value name="RED">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+        <value name="GREEN">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="BLUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="colour_blend">
+        <value name="COLOUR1">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#ff0000</field>
+          </shadow>
+        </value>
+        <value name="COLOUR2">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#3333ff</field>
+          </shadow>
+        </value>
+        <value name="RATIO">
+          <shadow type="math_number">
+            <field name="NUM">0.5</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <sep></sep>
+    <category id="catVariables" colour="330" custom="VARIABLE" name="변수"></category>
+    <category id="catFunctions" colour="290" custom="PROCEDURE" name="함수"></category>
+  </xml>
+		<script src="resources/js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="//prismjs.com/prism.js" data-default-language="markup"></script>
+		<script>
+			//Ace Editor
+			var editor = ace.edit("editor");
+			editor.setTheme("ace/theme/eclipse");
+			editor.getSession().setMode("ace/mode/python");
+			editor.setShowInvisibles(true);
+			editor.setReadOnly(true);
+			//Blockly
+			var blockly = Blockly.inject('blockEditor', {toolbox: document.getElementById('toolbox'), zoom: {controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2}, trashcan: true});
+			
+			function myUpdateFunction(event) {
+				var code = Blockly.Python.workspaceToCode(blockly);
+				editor.setValue(code);
+				editor.clearSelection();
+				//document.getElementById('textarea').value = code;
+			}
+			blockly.addChangeListener(myUpdateFunction);
+		</script>
+	</body>
+</html>

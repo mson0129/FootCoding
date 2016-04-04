@@ -1,0 +1,67 @@
+@charset "utf-8";
+
+/*
+Color
+Fasoo LightBlue: #51A0CF
+Fasoo DeepBlue: #2184B8
+Fasoo LightGreen: #70B153
+Fasoo DeepGreen: #399B57
+Fasoo LightOrange: #F4AB40
+Fasoo DeepOrange: #ED9519
+Michael Son 6-Level Gray: 	#000	#333	#666	#999	#CCC	#FFF
+Michael Son 4-Level Gray:	#000	#555	#AAA	#FFF
+*/
+
+@font-face {
+	font-family: 'BM JUA';
+	font-weight: normal;
+	font-style: normal;
+	src: url('/resources/fonts/BM-JUA.eot');
+	src: url('/resources/fonts/BM-JUA.eot?#iefix') format('embedded-opentype'),
+		url('/resources/fonts/BM-JUA.woff') format('woff'),
+		url('/resources/fonts/BM-JUA.svg#BM-JUA') format('svg'),
+		url('/resources/fonts/BM-JUA.ttf') format('truetype');
+}
+
+body {background-color: #70B153; background: linear-gradient(to right, #2184B8 , #399B57); font-family: 'BM JUA';}
+
+h1 {display: none;}
+
+header > nav, section, footer > address {display: none;}
+header > h1 {position: absolute; right: 0; top: 10%; left: 0; font-size: 4em; color: #FFF; text-align: center;}
+
+footer {color: #FFF; font-family: 'NanumBarunGothic'}
+footer > div {position: absolute; font-size: 0.8em;}
+footer > div#logo {top: 2em; left: 2em;}
+footer > div#copyright {bottom: 1em; left: 1em;}
+footer > div#additionalInfo {right: 1em; bottom: 1em;}
+
+div.popupLayer {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
+div.popupLayer > div {display: table; table-layout: fixed; width: 100%; height: 100%;}
+div.popupLayer > div > div {display: table-cell; text-align: center; vertical-align: middle; }
+div.popupLayer > div > div > div {display: inline-block; position: relative; width: 20em; padding: 1em; border-radius: 0.2em;}
+div.popupLayer img {width: 100%;}
+div.popupLayer button {display: block; width: 100%; padding: 0.5em; margin: 0.5em 0; border: 1px solid #FFF; border-radius: 0.2em; background-color: transparent; color: #FFF; font-size: 1.5em; font-family: 'BM JUA';}
+div.popupLayer button:hover {background-color: #FFF; color: #399B57;}
+
+/*Phone*/
+@media screen and (max-width: 479px){
+}
+@media screen and (min-width: 480px) and (max-width: 767px) {
+}
+@media screen and (max-width: 767px) {
+	body {font-size: 16px;}
+}
+
+/*Desktop*/
+@media screen and (min-width: 768px) {
+}
+@media screen and (min-width: 768px) and (max-width: 1440px) {
+	body {font-size: 18px;}
+}
+@media screen and (min-width: 1441px) and (max-width: 1920px) {
+	body {font-size: 20px;}
+}
+@media screen and (min-width: 1921px) {
+	body {font-size: 22px;}
+}
